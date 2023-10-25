@@ -8,3 +8,6 @@ class Server:
 
     def __init__(self):
         print()
+        struct = self.Lidar(x=[4.0,4,4,3], y=[4.0,4,4,3], Loop_Count=0)
+
+        print(struct)
