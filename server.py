@@ -3,6 +3,7 @@ import time
 import sys 
 import Lidar
 from collections import namedtuple
+import base64
 
 class Server:
 
@@ -32,6 +33,16 @@ class Server:
         self.ret, self.scan, self.laser = Lidar.Initialize_SDK(laser)
 
 
+    def Encrypting_Data(self, x,y , count):
+        point = (x, y)
+
+        # encode the data to bytes 
+        byte_data = str(point).encode('utf-8')
+
+        #encode using base64
+        decode_data = base64.b64decode(byte_data)
+
+        return decode_data
 
     def Send_Data(self):
         count = 0
@@ -44,10 +55,11 @@ class Server:
                 #Loop Count 
                 count = count + 1 
 
-                # Store the data in the struct
-                self.Memory  = self.Lidar_Data(x=x, y=y, Loop_Count=count)
+                data = self.Encrypting_Data(x,y)
 
-                self.server.sendto( bytes( str(self.Memory), 'UTF-8'), (self.Cli_address) )
+                # Store the data in the struct
+
+                self.server.sendto(data, (self.Cli_address) )
 
 
         except KeyboardInterrupt:

@@ -1,6 +1,7 @@
 import socket 
 import time 
 import sys 
+import base64
 from collections import namedtuple
 import matplotlib.pyplot as plt
 
@@ -28,6 +29,16 @@ class Client():
         
         self.client.bind((ServerIp,  100))
 
+
+    def Decrypting_Data(self, Data):
+
+        decode_data = base64.b64decode(Data)
+
+        point = decode_data.decode('utf-8')
+
+        return point
+
+
     def Display_Data(self, x,y):
         plt.clf()
         plt.scatter(x,y)
@@ -40,11 +51,9 @@ class Client():
 
                 data, addr = self.client.recvfrom(1024)
                 
+                point = self.Decrypting_Data(data)
                 
-                plt.clf()
-                plt.scatter(data.x,data.y)
-                plt.pause(.1)
-            plt.show()
+                print(point)
             
         except KeyboardInterrupt:
             self.client.close()
