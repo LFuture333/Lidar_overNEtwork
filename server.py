@@ -21,7 +21,7 @@ class Server:
 
         Client_Ip = input("Enter the Client IP: ")
 
-        self.Cli_address= (Client_Ip, 100) 
+        self.Cli_address= ("192.168.0.2", 100) 
 
     # Declare the lidar parameters 
     def initiate_Lidar(self):
@@ -33,14 +33,14 @@ class Server:
         self.ret, self.scan, self.laser = Lidar.Initialize_SDK(laser)
 
 
-    def Encrypting_Data(self, x,y , count):
+    def Encrypting_Data(self, x,y ):
         point = (x, y)
 
         # encode the data to bytes 
         byte_data = str(point).encode('utf-8')
 
         #encode using base64
-        decode_data = base64.b64decode(byte_data)
+        decode_data = base64.b64encode(byte_data)
 
         return decode_data
 
@@ -51,15 +51,19 @@ class Server:
                 
                 #extracting lidar data from the sdk
                 x,y = Lidar.Extract_Data(self.ret, self.scan, self.laser)
-
-                #Loop Count 
+                
+                time.sleep(.5)
+                
+                  #Loop Count 
                 count = count + 1 
-
-                data = self.Encrypting_Data(x,y)
-
+                if (len(x) != 0):
+                    data = self.Encrypting_Data(x,y)
+                    self.server.sendto(data, (self.Cli_address) )
+                    
+                else:
+                    print("empty data: " + str(len(x)))
                 # Store the data in the struct
 
-                self.server.sendto(data, (self.Cli_address) )
 
 
         except KeyboardInterrupt:

@@ -25,7 +25,7 @@ class Client():
 
         self.client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         
-        ServerIp = input("Enter thr server ip: ")
+        ServerIp = "192.168.0.36"
         
         self.client.bind((ServerIp,  100))
 
@@ -54,6 +54,7 @@ class Client():
                 point = self.Decrypting_Data(data)
                 
                 print(point)
+                
             
         except KeyboardInterrupt:
             self.client.close()
