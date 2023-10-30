@@ -7,7 +7,7 @@ import base64
 
 class Server:
 
-    Lidar_Data = namedtuple('Lidar', ['x','y', 'Loop_Count'])
+    
 
     # Declaring the socket for the server
     def initiate_socket(self):
@@ -23,26 +23,17 @@ class Server:
 
         self.Cli_address= ("192.168.0.2", 100) 
 
-    # Declare the lidar parameters 
-    def initiate_Lidar(self):
+   
+
     
-        port = Lidar.Get_port()
+    def Decrypting_Data(self, Data):
+
+        decode_data = base64.b64decode(Data)
+
+        point = decode_data.decode('utf-8')
+
+        return point
     
-        laser = Lidar.Parameters(port)
-    
-        self.ret, self.scan, self.laser = Lidar.Initialize_SDK(laser)
-
-
-    def Encrypting_Data(self, x,y ):
-        point = (x, y)
-
-        # encode the data to bytes 
-        byte_data = str(point).encode('utf-8')
-
-        #encode using base64
-        decode_data = base64.b64encode(byte_data)
-
-        return decode_data
 
     def Send_Data(self):
         count = 0
@@ -50,19 +41,8 @@ class Server:
             while True:
                 
                 #extracting lidar data from the sdk
-                x,y = Lidar.Extract_Data(self.ret, self.scan, self.laser)
                 
-                time.sleep(.5)
-                
-                  #Loop Count 
-                count = count + 1 
-                if (len(x) != 0):
-                    data = self.Encrypting_Data(x,y)
-                    self.server.sendto(data, (self.Cli_address) )
-                    
-                else:
-                    print("empty data: " + str(len(x)))
-                # Store the data in the struct
+                #Decrypting The data
 
 
 

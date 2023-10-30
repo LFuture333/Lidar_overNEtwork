@@ -3,57 +3,59 @@ import time
 import sys 
 import base64
 from collections import namedtuple
-import matplotlib.pyplot as plt
+import Lidar
 
 
 class Client():
-
-    Lidar_Data = namedtuple('Lidar', ['x','y','Loop_Count'])
 
     def __init__(self):
 
         self.initiate_socket()
 
-        self.Recv_Data()
+        self.initiate_Lidar()
+
+        self.Send_Data()
+
+
 
     def initiate_socket(self):
 
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM )
 
 
-        self.client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+     # Declare the lidar parameters 
+    def initiate_Lidar(self):
+    
+        port = Lidar.Get_port()
+    
+        laser = Lidar.Parameters(port)
+    
+        self.ret, self.scan, self.laser = Lidar.Initialize_SDK(laser)
 
-        self.client.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        
-        ServerIp = "192.168.0.36"
-        
-        self.client.bind((ServerIp,  100))
+    def Encrypting_Data(self, x,y ):
+        point = (x, y)
 
+        # encode the data to bytes 
+        byte_data = str(point).encode('utf-8')
 
-    def Decrypting_Data(self, Data):
+        #encode using base64
+        decode_data = base64.b64encode(byte_data)
 
-        decode_data = base64.b64decode(Data)
+        return decode_data
+    
 
-        point = decode_data.decode('utf-8')
-
-        return point
-
-
-    def Display_Data(self, x,y):
-        plt.clf()
-        plt.scatter(x,y)
-        plt.pause(0.1)
-
-    def Recv_Data(self):
+    def Send_Data(self):
 
         try:
             while True:
-
-                data, addr = self.client.recvfrom(1024)
+                x,y = Lidar.Extract_Data(self.ret, self.scan, self.laser)
+            
+                #encrypt the data 
+                data = self.Encrypting_Data(x,y)
+            
+                self.client.sendto(data, ('192.168.0.36', 100))
                 
-                point = self.Decrypting_Data(data)
                 
-                print(point)
                 
             
         except KeyboardInterrupt:
