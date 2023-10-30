@@ -7,11 +7,11 @@ import matplotlib.pyplot as plt
 
 class Client():
 
-    Lidar_Data = namedtuple('Lidar', ['x','y,','Loop_Count'])
+    Lidar_Data = namedtuple('Lidar', ['x','y','Loop_Count'])
 
     def __init__(self):
 
-        self.Connection()
+        self.initiate_socket()
 
         self.Recv_Data()
 
@@ -49,3 +49,5 @@ class Client():
         except KeyboardInterrupt:
             self.client.close()
             sys.exit()
+if __name__ == "__main__":
+    Client();
