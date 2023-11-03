@@ -1,33 +1,29 @@
-import socket
+from socket import *
 import time 
-import sys 
-import Lidar
-from collections import namedtuple
+import sys
+
+import matplotlib.pyplot as plt
 import base64
+
 
 class Server:
 
+    def __init__(self):
+        self.initate_socket();
     
+        self.Recv_Data()
 
-    # Declaring the socket for the server
-    def initiate_socket(self):
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
-        
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.server.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-        self.server.settimeout(0.2)
+    def initate_socket(self):
+        ip = input("Enter Ip address: ")
 
 
-        Client_Ip = input("Enter the Client IP: ")
+        self.address = (ip, 100)
+        self.s = socket(AF_INET, SOCK_DGRAM)
 
-        self.Cli_address= ("192.168.0.2", 100) 
+        self.s.settimeout(0.2)
+        self.s.bind(self.address)
 
-   
-
-    
     def Decrypting_Data(self, Data):
-
         decode_data = base64.b64decode(Data)
 
         point = decode_data.decode('utf-8')
@@ -35,32 +31,28 @@ class Server:
         return point
     
 
-    def Send_Data(self):
-        count = 0
-        try:
-            while True:
-                
-                #extracting lidar data from the sdk
-                
-                #Decrypting The data
 
+    def Recv_Data(self):
+        try:    
+            while True:
+                x= 0 
+                y = 0
+                data, addr = self.s.recvfrom(1024)
+
+                point = self.Decrypting_Data(data)
+
+                plt.clf()
+                plt.scatter(point)
+                plt.pause(0.1)
+
+            plt.show()
 
 
         except KeyboardInterrupt:
-            self.server.close()
+            self.s.close()
             sys.exit()
 
-    def __init__(self):
-        self.initiate_socket()
-
-        self.initiate_Lidar()
-
-        self.Send_Data()
-
-
-if __name__ == "__main__":
-
-    Server();
-
+if __name__ ==  "__main__":
 
     
+    Server()
