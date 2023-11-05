@@ -5,6 +5,7 @@ import sys
 import Lidar
 import numpy as np
 import base64
+import pickle
 
 
 class Server:
@@ -55,13 +56,17 @@ class Server:
 #####################################################################
     def Encrypt(self, data):
 
-        #Encode the Data to bytes 
-        byte_data = str(data).encode('utf-8')
-
-        #encode using the base64
-        encode_data = base64.b64encode(byte_data)
         
-        return encode_data
+
+
+        #Dumping data as byte to be send over network
+
+        byte = pickle.dumps(data)
+
+        msg = base64.b64encode(byte)
+
+
+        return msg
 
 
 #####################################################################
@@ -80,8 +85,9 @@ class Server:
 
         # Extract raw data from the lidar 
         x,y = Lidar.Extract_Data(self.ret, self.scan, self.laser)
+        point = ([x],[y])
+       
 
-        point = (x, y)
 
         msg_encrypted = self.Encrypt( data=point)
         
